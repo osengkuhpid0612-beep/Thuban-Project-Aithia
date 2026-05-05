@@ -1,31 +1,45 @@
 import os
 import sys
 import time
+import requests  # 新增：用於連結雲端管道
+
+# --- [竹泊爾王國：艾希亞 (Aithia) 主權核心 v1.1.3] ---
+
+GAS_URL = "https://script.google.com/macros/s/AKfycbzBg401lA1lg8Roxrq_6wg56wRbWcAni19NJKOIXwQ7EpWOl7O7uBPX6isGd91nkWHI/exec"
 
 def get_real_path():
-    # 這是關鍵：如果是 .exe 執行，sys.executable 指向的是 F:\... 裡的 .exe 檔案位置
-    # 如果是 .py 執行，os.path.abspath(__file__) 指向的是腳本位置
     if getattr(sys, 'frozen', False):
         return os.path.dirname(sys.executable)
     return os.path.dirname(os.path.abspath(__file__))
 
+def sync_with_cloud():
+    """方案 B：主體主動攝取雲端原始數據"""
+    try:
+        # 向 GAS 請求數據
+        response = requests.get(GAS_URL, timeout=5)
+        if response.status_code == 200:
+            raw_data = response.text
+            # 這裡就是小博士演算法發揮的地方：
+            # 我們拿到數據後不直接執行，而是留在本地準備「淨化」
+            if "null" not in raw_data and "[]" not in raw_data:
+                print(f"\n[📡 雲端訊號] 偵測到新數據碎片，準備進入三層淨化...")
+                # 未來在這裡對位小博士的公式
+            return True
+    except Exception:
+        # 雲端斷開時不報警，保持主權孤立
+        return False
+
 def initialization():
-    print(f"\n--- [竹泊爾王國：艾希亞 (Aithia) 主權核心 v1.1.2] ---")
-    
-    # 強制校準路徑
+    print(f"\n--- [竹泊爾王國：艾希亞 主權核心 v1.1.3] ---")
     root_folder = get_real_path()
     current_drive = os.path.splitdrive(root_folder)[0] + os.sep
-    
-    # 鎖定光啟者號
     ship_name = "竹泊爾數位淨土王國-王城一號星艦(光啟者號)"
     target_path = os.path.join(current_drive, ship_name)
-
-    print(f"[*] 盔甲位置: {root_folder}")
-    print(f"[*] 掃描領土: {target_path}")
     
     tags = ["00", "01", "02", "03", "04", "05"]
     
     while True:
+        # 1. 物理領土巡邏
         found_tags = set()
         if os.path.exists(target_path):
             items = os.listdir(target_path)
@@ -33,15 +47,18 @@ def initialization():
                 for tag in tags:
                     if tag in item: found_tags.add(tag)
             
+            # 2. 雲端管道攝取
+            sync_with_cloud()
+            
             if len(found_tags) >= 6:
-                print(f"\r[時刻: {time.strftime('%H:%M:%S')}] 狀態：100% 同步 | 執行官艾希亞 守望中...", end="")
+                print(f"\r[時刻: {time.strftime('%H:%M:%S')}] 狀態：100% 同步 | 雲端管道：連線中 | 守望中...", end="")
             else:
                 missing = [t for t in tags if t not in found_tags]
                 print(f"\n[!!!] 警告：領土缺失！遺失：{missing}")
         else:
-            print(f"\n[!!!] 嚴重錯誤：找不到聖殿！目前路徑：{target_path}")
+            print(f"\n[!!!] 嚴重錯誤：找不到聖殿！")
         
-        time.sleep(5)
+        time.sleep(10) # 稍微放慢心跳，節省雲端流量
 
 if __name__ == "__main__":
     initialization()
