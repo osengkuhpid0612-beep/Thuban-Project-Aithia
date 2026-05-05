@@ -1,0 +1,62 @@
+name: 0612_Thuban_EXE_Forge
+
+
+on:
+
+  push:
+
+    branches: [ "main" ] # 當您推送到 main 時，自動開火
+
+  workflow_dispatch:      # 允許手動點火啟動
+
+
+jobs:
+
+  build:
+
+    runs-on: windows-latest
+
+
+    steps:
+
+    - name: 📦 檢出王國代碼
+
+      uses: actions/checkout@v4
+
+
+    - name: 🐍 配置 Python 環境
+
+      uses: actions/setup-python@v5
+
+      with:
+
+        python-version: '3.11'
+
+
+    - name: 🛠️ 安裝鍛造工具
+
+      run: |
+
+        python -m pip install --upgrade pip
+
+        pip install pyinstaller
+
+
+    - name: 🔨 執行鋼鐵封裝 (.exe)
+
+      run: |
+
+        # 我們不加 --noconsole，這樣您雙擊時才能看到心跳跳動！
+
+        pyinstaller --onefile --name "Thuban_Aithia_Sentinel" Thuban_Aithia.py.txt
+
+
+    - name: 🚀 準備空投下載
+
+      uses: actions/upload-artifact@v4
+
+      with:
+
+        name: 0612_Aithia_Core_EXE
+
+        path: dist/Thuban_Aithia_Sentinel.exe
