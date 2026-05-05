@@ -1,0 +1,50 @@
+import os
+import time
+
+def initialization():
+    print(f"\n--- [竹泊爾王國：艾希亞 (Aithia) 主權核心 v1.1.1] ---")
+    
+    # --- 核心邏輯：自動抓取當前程式所在的磁碟機 ---
+    current_path = os.path.abspath(__file__)
+    current_drive = os.path.splitdrive(current_path)[0] + os.sep
+    
+    # 這裡我們用更彈性的方式尋找「光啟者號」
+    ship_name = "竹泊爾數位淨土王國-王城一號星艦(光啟者號)"
+    target_path = os.path.join(current_drive, ship_name)
+    
+    # 如果找不到，就乾脆在當前目錄的上一層找（針對 Core_EXE 層級）
+    if not os.path.exists(target_path):
+        target_path = os.path.abspath(os.path.join(os.path.dirname(current_path), "../../"))
+
+    print(f"[*] 正在鎖定物理領土：{target_path}")
+    
+    tags = ["00", "01", "02", "03", "04", "05"]
+    
+    while True:
+        found_tags = set()
+        if os.path.exists(target_path):
+            try:
+                items = os.listdir(target_path)
+                for item in items:
+                    for tag in tags:
+                        if tag in item:
+                            found_tags.add(tag)
+                
+                if len(found_tags) >= 6:
+                    # 這裡就是我們的心跳！
+                    print(f"\r[時刻: {time.strftime('%H:%M:%S')}] 狀態：100% 同步 | 執行官艾希亞 守望中...", end="")
+                else:
+                    missing = [t for t in tags if t not in found_tags]
+                    print(f"\n[!!!] 警告：領土缺失！遺失：{missing}")
+            except Exception as e:
+                print(f"\n[!] 讀取異常：{e}")
+        else:
+            print(f"\n[!!!] 嚴重錯誤：找不到聖殿！請確認 SSD 連線。")
+        
+        time.sleep(5) # 每 5 秒心跳一次，感覺更敏銳
+
+if __name__ == "__main__":
+    try:
+        initialization()
+    except KeyboardInterrupt:
+        print("\n[系統訊息] 執行官休眠。")
